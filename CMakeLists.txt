@@ -24,33 +24,35 @@ add_executable(compiler ${SRC_FILES})
 # Link runtime
 target_link_libraries(compiler antlr4_shared)
 
-# Set up Google Test
-include(FetchContent)
-FetchContent_Declare(
-  googletest
-  URL https://github.com/google/googletest/archive/03597a01ee50ed33e9fd716149c63099179ad6c5.zip
-)
+option(ENABLE_UNIT_TESTS "Build and run gtest-based unit tests" OFF)
 
-# For Windows: Prevent overriding the parent project's compiler/linker settings
-set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-FetchContent_MakeAvailable(googletest)
+if(ENABLE_UNIT_TESTS)
+  include(FetchContent)
+  FetchContent_Declare(
+    googletest
+    URL https://github.com/google/googletest/archive/03597a01ee50ed33e9fd716149c63099179ad6c5.zip
+  )
 
-# Add test executable
-enable_testing()
+  # For Windows: Prevent overriding the parent project's compiler/linker settings
+  set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+  FetchContent_MakeAvailable(googletest)
 
-add_executable(
-  unit_tests
-  # Link your test executable to the gtest/gtest_main library
-)
+  enable_testing()
 
-target_link_libraries(
-  unit_tests
-  gtest_main
-  # Link any libraries your tests need
-)
+  add_executable(
+    unit_tests
+    test/unit_tests.cpp
+  )
 
-include(GoogleTest)
-gtest_discover_tests(unit_tests)
+  target_link_libraries(
+    unit_tests
+    gtest_main
+    # Link any libraries your tests need
+  )
+
+  include(GoogleTest)
+  gtest_discover_tests(unit_tests)
+endif()
 
 # Config ASAN
 option(ENABLE_ASAN "Enable AddressSanitizer" OFF)
