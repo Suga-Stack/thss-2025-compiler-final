@@ -2,7 +2,8 @@ cmake_minimum_required(VERSION 3.10)
 project(compiler LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
-
+find_package(Threads REQUIRED)
+set(THREADS_PREFER_PTHREAD_FLAG ON)
 # Include antlr4 runtime
 add_subdirectory(third_party/antlr4-runtime)
 
@@ -22,7 +23,7 @@ file(GLOB SRC_FILES
 add_executable(compiler ${SRC_FILES})
 
 # Link runtime
-target_link_libraries(compiler antlr4_shared)
+target_link_libraries(compiler antlr4_shared Threads::Threads)
 
 option(ENABLE_UNIT_TESTS "Build and run gtest-based unit tests" OFF)
 

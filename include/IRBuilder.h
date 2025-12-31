@@ -4,12 +4,14 @@
 #include <memory>
 #include "IR.h"
 
-class IRBuilder {
+class IRBuilder
+{
 public:
   explicit IRBuilder(Module *m) : module(m) {}
-  Function *createFunction(const std::string &name, TypePtr retType);
+  Function *createFunction(const std::string &name, TypePtr retType, bool isDecl = false);
   BasicBlock *createBasicBlock(Function *f, const std::string &name);
   void setInsertPoint(BasicBlock *bb) { insertBB = bb; }
+  bool isTerminated() const { return insertBB && insertBB->isTerminated(); }
 
   // instruction helpers (return textual names where appropriate)
   std::string createAlloca(TypePtr ty, const std::string &hint);
@@ -22,9 +24,11 @@ public:
   std::string createICmp(const std::string &pred, const std::string &lhs, const std::string &rhs, const std::string &hint);
   std::string createCall(const std::string &callee, const std::vector<std::pair<std::string, TypePtr>> &args, TypePtr retTy, const std::string &hint);
   std::string createGEP(TypePtr elemTy, const std::string &basePtr, const std::vector<std::string> &indices, const std::string &hint);
+  std::string createZExt(const std::string &val, TypePtr fromTy, TypePtr toTy, const std::string &hint);
 
 private:
   Module *module;
+  Function *curFunc = nullptr;
   BasicBlock *insertBB = nullptr;
   unsigned tmpCounter = 0;
   unsigned blockCounter = 0;

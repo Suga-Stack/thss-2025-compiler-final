@@ -1,5 +1,5 @@
 compiler:
-	cd build && cmake .. && make -j8
+	rm -rf build && mkdir build && cd build && cmake .. && make -j8
 
 antlr:
 	java -jar lib/antlr-4.13.1-complete.jar -Dlanguage=Cpp -visitor -no-listener -o src/antlr/ SysYLexer.g4 SysYParser.g4
