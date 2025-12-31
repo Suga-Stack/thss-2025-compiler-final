@@ -5,22 +5,24 @@
 #include <string>
 #include <vector>
 
-// Minimal type system for SysY -> LLVM IR framework
+// 最小化类型系统，用于 SysY 到 LLVM IR 的转换框架
 class Type
 {
 public:
+	// 类型ID枚举
 	enum TypeID
 	{
-		IntTy,
-		VoidTy,
-		PointerTy,
-		ArrayTy,
-		FunctionTy,
-		BoolTy
+		IntTy,		// 32位整数 (i32)
+		VoidTy,		// Void类型 (void)
+		PointerTy,	// 指针类型 (type*)
+		ArrayTy,	// 数组类型 ([n x type])
+		FunctionTy, // 函数类型
+		BoolTy		// 布尔类型 (i1)
 	};
 	explicit Type(TypeID id) : id(id) {}
 	virtual ~Type() = default;
 	TypeID getID() const { return id; }
+	// 返回类型的字符串表示 (用于生成 IR)
 	virtual std::string toString() const = 0;
 
 private:
@@ -29,7 +31,7 @@ private:
 
 using TypePtr = std::shared_ptr<Type>;
 
-// Int type (singleton for simplicity)
+// 整数类型 (单例模式，简化管理)
 class IntType : public Type
 {
 public:
@@ -42,6 +44,7 @@ public:
 	IntType() : Type(Type::IntTy) {}
 };
 
+// Void 类型
 class VoidType : public Type
 {
 public:
@@ -54,6 +57,7 @@ public:
 	VoidType() : Type(Type::VoidTy) {}
 };
 
+// 指针类型
 class PointerType : public Type
 {
 public:
@@ -62,9 +66,10 @@ public:
 	std::string toString() const override { return pointee->toString() + "*"; }
 
 private:
-	TypePtr pointee;
+	TypePtr pointee; // 指向的类型
 };
 
+// 数组类型
 class ArrayType : public Type
 {
 public:
@@ -78,10 +83,11 @@ public:
 	}
 
 private:
-	TypePtr elementType;
-	uint64_t elementCount;
+	TypePtr elementType;   // 元素类型
+	uint64_t elementCount; // 元素数量
 };
 
+// 函数类型
 class FunctionType : public Type
 {
 public:
@@ -103,10 +109,11 @@ public:
 	}
 
 private:
-	TypePtr ret;
-	std::vector<TypePtr> args;
+	TypePtr ret;			   // 返回值类型
+	std::vector<TypePtr> args; // 参数类型列表
 };
 
+// 布尔类型 (i1)
 class BoolType : public Type
 {
 public:

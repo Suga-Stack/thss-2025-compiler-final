@@ -2,6 +2,7 @@
 #include <sstream>
 
 // BasicBlock
+// 将指令添加到基本块的最前端 (用于 alloca 优化)
 void BasicBlock::addInstFront(InstPtr inst)
 {
   insts.insert(insts.begin(), std::move(inst));
@@ -10,10 +11,10 @@ void BasicBlock::addInstFront(InstPtr inst)
 std::string BasicBlock::toString() const
 {
   std::ostringstream oss;
-  oss << name << ":\n";
+  oss << name << ":\n"; // 打印基本块标签
   for (const auto &i : insts)
   {
-    oss << "  " << i->toString() << "\n";
+    oss << "  " << i->toString() << "\n"; // 打印每条指令
   }
   return oss.str();
 }

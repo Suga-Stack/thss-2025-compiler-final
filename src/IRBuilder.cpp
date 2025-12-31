@@ -36,6 +36,8 @@ std::string IRBuilder::uniqueBlock(const std::string &hint)
   return oss.str();
 }
 
+// 创建 alloca 指令 (栈内存分配)
+// 优化：始终在当前函数的入口块(Entry Block)的前端插入 alloca，避免循环中栈空间爆炸
 std::string IRBuilder::createAlloca(TypePtr ty, const std::string &hint)
 {
   std::string name = uniqueTmp(hint.empty() ? "tmp" : hint);

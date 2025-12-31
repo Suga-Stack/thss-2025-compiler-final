@@ -1,4 +1,4 @@
-// Minimal IR core declarations
+// 最小化 IR 核心声明
 #pragma once
 
 #include <memory>
@@ -6,23 +6,24 @@
 #include <vector>
 #include "Type.h"
 
-// Core Value/Instruction/Module hierarchy (minimal and string-based)
+// 核心 Value/Instruction/Module 层次结构 (基于字符串的最小化实现)
 class Instruction
 {
 public:
   virtual ~Instruction() = default;
-  virtual std::string toString() const = 0;
-  virtual bool isTerminator() const { return false; }
+  virtual std::string toString() const = 0;           // 生成该指令的 LLVM IR 字符串
+  virtual bool isTerminator() const { return false; } // 是否为终结指令 (如 ret, br)
 };
 
 using InstPtr = std::unique_ptr<Instruction>;
 
+// 基本块：包含一系列指令
 class BasicBlock
 {
 public:
   explicit BasicBlock(std::string name) : name(std::move(name)) {}
   void addInst(InstPtr inst) { insts.emplace_back(std::move(inst)); }
-  void addInstFront(InstPtr inst); // Add instruction to the beginning
+  void addInstFront(InstPtr inst); // 将指令添加到块的开头 (用于 alloca 优化)
   const std::string &getName() const { return name; }
   std::string toString() const;
   bool isTerminated() const { return !insts.empty() && insts.back()->isTerminator(); }
@@ -40,6 +41,7 @@ struct FunctionParam
   TypePtr type;
 };
 
+// 函数：包含参数和基本块
 class Function
 {
 public:
@@ -59,11 +61,12 @@ private:
   TypePtr retType;
   std::vector<FunctionParam> params;
   std::vector<BBPtr> blocks;
-  bool isDeclaration;
+  bool isDeclaration; // 是否仅为声明 (如库函数)
 };
 
 using FunctionPtr = std::unique_ptr<Function>;
 
+// 全局变量
 class GlobalVariable
 {
 public:
@@ -75,11 +78,12 @@ public:
 private:
   std::string name;
   TypePtr ty;
-  std::string init; // textual initializer
+  std::string init; // 初始化的文本表示 (如 "zeroinitializer" 或 "123")
 };
 
 using GlobalPtr = std::unique_ptr<GlobalVariable>;
 
+// 模块：包含全局变量和函数
 class Module
 {
 public:
@@ -94,7 +98,7 @@ private:
   std::vector<GlobalPtr> globals;
 };
 
-// Simple instruction implementations
+// 具体的指令实现类
 class AllocaInst : public Instruction
 {
 public:
